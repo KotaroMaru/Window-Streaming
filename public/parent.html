@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>プロジェクター制御 - 親</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="parent-app">
+
+  <header class="app-header">
+    <h1>🎬 プロジェクター<span>制御</span></h1>
+    <div id="status-bar" class="status-bar">
+      <div id="status-dot" class="status-dot"></div>
+      <span id="status-text">子PC: 未接続</span>
+    </div>
+  </header>
+
+  <!-- モード切替 -->
+  <div class="mode-tabs">
+    <div class="mode-tab active" id="tab-screen" onclick="switchMode('screen')">
+      🖥️ 画面共有モード
+    </div>
+    <div class="mode-tab" id="tab-bgm" onclick="switchMode('bgm')">
+      🎵 BGMモード
+    </div>
+  </div>
+
+  <!-- 画面共有セクション -->
+  <div class="share-section active" id="section-screen">
+    <div class="card">
+      <h2>画面共有</h2>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">
+        「画面共有開始」を押すとシステム音声を含む画面をプロジェクターへ配信します。<br>
+        共有ダイアログでは「システムサウンドを共有」を有効にしてください。
+      </p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-primary" id="btn-start-share" onclick="startScreenShare()">
+          ▶ 画面共有開始
+        </button>
+        <button class="btn btn-danger" id="btn-stop-share" onclick="stopScreenShare()" disabled>
+          ■ 配信停止
+        </button>
+      </div>
+      <div id="share-status" style="margin-top:12px;font-size:13px;color:var(--text-muted);"></div>
+    </div>
+  </div>
+
+  <!-- BGMセクション -->
+  <div class="bgm-section" id="section-bgm">
+    <div class="card">
+      <h2>楽曲アップロード</h2>
+      <p style="font-size:12px;color:var(--yellow);margin-bottom:10px;">
+        ⚠ サーバー再起動時にファイルはリセットされます（Render無料枠はディスク非永続）
+      </p>
+      <div class="dropzone" id="dropzone" onclick="document.getElementById('bgm-file-input').click()">
+        <div style="font-size:32px;">🎵</div>
+        <strong>クリックまたはドロップでアップロード</strong>
+        <p>MP3 / AAC / FLAC / WAV / OGG / M4A 対応（最大200MB/ファイル）</p>
+      </div>
+      <input type="file" id="bgm-file-input" multiple accept=".mp3,.aac,.flac,.wav,.ogg,.m4a">
+      <div id="upload-progress" style="font-size:13px;color:var(--text-muted);"></div>
+    </div>
+
+    <div class="card">
+      <h2>プレイリスト</h2>
+      <ul class="playlist" id="playlist"></ul>
+      <div id="playlist-empty" style="font-size:13px;color:var(--text-muted);padding:12px 0;display:none;">
+        曲がありません。まずアップロードしてください。
+      </div>
+
+      <div class="player-controls" id="player-controls">
+        <button class="btn btn-ghost btn-icon" onclick="prevTrack()" title="前の曲">⏮</button>
+        <button class="btn btn-primary btn-icon" id="btn-play-pause" onclick="togglePlayPause()">▶</button>
+        <button class="btn btn-ghost btn-icon" onclick="nextTrack()" title="次の曲">⏭</button>
+        <div class="now-playing">
+          <span id="now-playing-name">— 選択なし —</span>
+        </div>
+        <div class="volume-control">
+          🔊
+          <input type="range" id="volume-slider" min="0" max="100" value="80"
+                 oninput="setVolume(this.value)">
+          <span id="volume-label">80%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="parent.js"></script>
+</body>
+</html>
