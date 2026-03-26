@@ -14,7 +14,12 @@
 <div id="child-app">
 
   <!-- 受信映像 -->
-  <video id="remote-video" autoplay playsinline muted></video>
+  <video id="remote-video" autoplay playsinline></video>
+
+  <!-- 自動再生ポリシーでミュートになった場合のアンミュートボタン -->
+  <button id="unmute-btn" onclick="remoteVideo.muted=false;remoteVideo.volume=1.0;hideUnmuteButton();">
+    ▶ タップして音声を有効にする
+  </button>
 
   <!-- BGM再生用 audio -->
   <audio id="child-audio" autoplay></audio>

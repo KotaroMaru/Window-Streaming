@@ -93,7 +93,18 @@ async function handleOffer({ sdp }) {
   peerConnection.ontrack = ({ streams }) => {
     if (streams && streams[0]) {
       remoteVideo.srcObject = streams[0];
-      remoteVideo.play().catch(() => {});
+      remoteVideo.volume = 1.0;
+      // まず muted で再生開始（自動再生ポリシー対策）
+      remoteVideo.muted = true;
+      remoteVideo.play()
+        .then(() => {
+          // 再生開始後にアンミュート
+          remoteVideo.muted = false;
+        })
+        .catch(() => {
+          // 自動アンミュート失敗時はボタンを表示してユーザー操作を促す
+          showUnmuteButton();
+        });
       showVideo();
       hideOverlay();
     }
@@ -188,6 +199,15 @@ function hideVideo() { remoteVideo.classList.remove('active'); }
 
 function showBgmVisualizer() { bgmVisualizer.classList.add('active'); }
 function hideBgmVisualizer() { bgmVisualizer.classList.remove('active'); }
+
+function showUnmuteButton() {
+  const btn = document.getElementById('unmute-btn');
+  if (btn) btn.style.display = 'flex';
+}
+function hideUnmuteButton() {
+  const btn = document.getElementById('unmute-btn');
+  if (btn) btn.style.display = 'none';
+}
 
 // =====================================================
 // フルスクリーン（自動・再試行付き）

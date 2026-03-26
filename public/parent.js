@@ -110,12 +110,22 @@ async function startScreenShare() {
 
   try {
     localStream = await navigator.mediaDevices.getDisplayMedia({
-      video: { cursor: 'always' },
-      audio: true,
+      video: true,
+      audio: {
+        echoCancellation: false,
+        noiseSuppression: false,
+        sampleRate: 44100,
+      },
     });
   } catch (e) {
     setShareStatus('画面共有がキャンセルされました: ' + e.message);
     return;
+  }
+
+  // 音声トラックの有無を確認して警告表示
+  const audioTracks = localStream.getAudioTracks();
+  if (audioTracks.length === 0) {
+    setShareStatus('⚠ 音声トラックなし（Macではタブ共有を選択し「Share audio」にチェックを入れてください）');
   }
 
   // ユーザーが共有ダイアログを閉じた場合
@@ -124,7 +134,10 @@ async function startScreenShare() {
   });
 
   await createPeerConnection();
-  localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+  // 映像・音声トラックを明示的に追加（親側では再生しない）
+  localStream.getTracks().forEach(track => {
+    peerConnection.addTrack(track, localStream);
+  });
 
   try {
     const offer = await peerConnection.createOffer();
